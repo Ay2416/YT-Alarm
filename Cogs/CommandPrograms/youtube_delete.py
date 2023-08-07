@@ -58,7 +58,7 @@ class Delete:
 
             global count
             count = 0
-            cut = 25
+            cut = 10
             for j in range(0, len(read_data)):
                 # メンションの表示を指定
                 mention_view = ' '
@@ -69,7 +69,8 @@ class Delete:
 
                 if read_data[j]["type"] == mode1:
                     embed.add_field(name=str(count+1) + '. ' + read_data[j]["name"], value="チャンネル名：" + 'https://www.youtube.com/channel/' + read_data[j]["add_id"]
-                                    +"\nメンション：" + mention_view + "\nメッセージ：" + read_data[j]["message"], inline=False)
+                                    +"\nメンション：" + mention_view + "\n通常メッセージ：" + read_data[j]["normal_message"] + "\n 待機場所メッセージ：" + read_data[j]["wait_message"] 
+                                    + "\n プレミアム公開時メッセージ：" + read_data[j]["premium_message"], inline=False)
 
                     count = count + 1
                 

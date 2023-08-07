@@ -8,6 +8,7 @@ import re
 import requests
 import datetime
 import dateutil.parser
+import asyncio
 import scrapetube
 import feedparser
 from bs4 import BeautifulSoup
@@ -80,7 +81,7 @@ class Task:
                                     send_message = '<@&' + str(guild_data[j]["mention"]) + '>'
                                 
                                 # 通知の送信
-                                send_message = '\n' + guild_data[j]["wait_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
+                                send_message += '\n' + guild_data[j]["wait_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
                                 await webhook_send.webhook_send(guild_data[j]["webhook_url"], guild_data[j]["name"], guild_data[j]["picture_url"],send_message)
 
                                 # 通知を出したものはdata_jsonの「nofication」をyesに変更する
@@ -95,7 +96,7 @@ class Task:
                                     send_message = '<@&' + str(guild_data[j]["mention"]) + '>'
                             
                             # 通知の送信
-                            send_message = '\n' + guild_data[j]["normal_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
+                            send_message += '\n' + guild_data[j]["normal_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
                             await webhook_send.webhook_send(guild_data[j]["webhook_url"], guild_data[j]["name"], guild_data[j]["picture_url"],send_message)
 
                             # 通知を出したものはdata_jsonの「nofication」をyesに変更する
@@ -154,7 +155,7 @@ class Task:
                                     send_message = '<@&' + str(guild_data[j]["mention"]) + '>'
                                 
                                 # 通知の送信
-                                send_message = '\n' + guild_data[j]["wait_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
+                                send_message += '\n' + guild_data[j]["wait_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
                                 await webhook_send.webhook_send(guild_data[j]["webhook_url"], guild_data[j]["name"], guild_data[j]["picture_url"],send_message)
 
                                 # 通知を出したものはdata_jsonの「nofication」をyesに変更する
@@ -169,14 +170,14 @@ class Task:
                                 send_message = '<@&' + str(guild_data[j]["mention"]) + '>'
                             
                             # 通知の送信
-                            send_message = '\n' + guild_data[j]["premium_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
+                            send_message += '\n' + guild_data[j]["premium_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
                             await webhook_send.webhook_send(guild_data[j]["webhook_url"], guild_data[j]["name"], guild_data[j]["picture_url"],send_message)
 
                             # 通知を出したものはdata_jsonの「nofication」をyesに変更する
                             now_data[m]["nofication"] = "yes"
                         
                         # defaultの者がある場合は通知を出す
-                        elif now_data[m]["style"] == "DEFAULT" and now_data[j]["nofication"] != "yes":
+                        elif now_data[m]["style"] == "DEFAULT" and now_data[m]["nofication"] != "yes":
                             # old_dataの中でdefalutの一番新しい情報を探す
                             for l in range(0, len(old_data)):
                                 if old_data[l]["style"] == "DEFAULT":
@@ -189,7 +190,7 @@ class Task:
                                     hozon_num = n
 
                             # 更新を行う
-                            for o in range(hozon_num-1,-1,-1):
+                            for o in range(hozon_num,-1,-1):
                                 if now_data[o]["style"] == "DEFAULT" and now_data[o]["nofication"] != "yes":
 
                                     # メンションの設定はあるかの確認
@@ -198,7 +199,7 @@ class Task:
                                         send_message = '<@&' + str(guild_data[j]["mention"]) + '>'
                                     
                                     # 通知の送信
-                                    send_message = '\n' + guild_data[j]["normal_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
+                                    send_message += '\n' + guild_data[j]["normal_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
                                     await webhook_send.webhook_send(guild_data[j]["webhook_url"], guild_data[j]["name"], guild_data[j]["picture_url"],send_message)
 
                                     # 通知を出したものはdata_jsonの「nofication」をyesに変更する
@@ -214,42 +215,71 @@ class Task:
                             writer.writerow(now_data[n])
                 # shortsの場合
                 elif guild_data[j]["type"] == 'shorts':
-                        if now_data[m]["style"] == "DEFAULT" and now_data[j]["nofication"] != "yes":
+                    # 最新のデータを取ってくる
+                    try:
+                        channel_content = scrapetube.get_channel(channel_url='https://youtube.com/channel/' + guild_data[j]['add_id'], limit=10, sort_by="newest", content_type="shorts")
+                    except Exception as e:
+                        print('scrapetubeデータ取得でエラーが発生しました')
+                        continue
+
+                    # データをjson形式で変数に入れる
+                    now_data = []
+
+                    for video in channel_content:
+                        try:
+                            StartTime = video['upcomingEventData']['startTime']
+                        except Exception as e:
+                            StartTime = "no"
+                        
+                        content = {
+                            "videoId" : video['videoId'],
+                            "StartTime" : StartTime,
+                            "nofication" : "no"
+                        }
+
+                        now_data.append(content)
+
+                    # nofication が yes の場合の引木継ぎ
+                    for k in range(0, len(now_data)):
+                        for l in range(0, len(old_data)):
+                            if now_data[k]["videoId"] == old_data[l]["videoId"] and old_data[l]["nofication"] == "yes":
+                                now_data[k]["nofication"] = "yes"
+                    
+                    for m in range(0, len(now_data)):
+                        if now_data[m]["nofication"] != "yes":
                             # old_dataの中でdefalutの一番新しい情報を探す
-                            for l in range(0, len(old_data)):
-                                if old_data[l]["style"] == "DEFAULT":
-                                    hozon_videoId = old_data[l]["videoId"]
-                                    break
+                            hozon_videoId = old_data[0]["videoId"]
                             
                             # new_dataとold_dataの１番上に来てるものよりも上にあるものを投稿されたものとして扱う
                             for n in range(0, len(now_data)):
-                                if now_data[n]["style"] == "DEFAULT" and now_data[n]["videoId"] == hozon_videoId:
+                                if now_data[n]["videoId"] == hozon_videoId:
                                     hozon_num = n
 
                             # 更新を行う
-                            for o in range(hozon_num-1,-1,-1):
+                            for o in range(hozon_num,-1,-1):
 
                                 # メンションの設定はあるかの確認
                                 send_message = ""
-                                if now_data[o]["style"] == "DEFAULT" and now_data[o]["nofication"] != "yes":
+                                if now_data[o]["nofication"] != "yes":
                                     if guild_data[j]["mention"] != "Off":
                                         send_message = '<@&' + str(guild_data[j]["mention"]) + '>'
                                     
                                     # 通知の送信
-                                    send_message = '\n' + guild_data[j]["normal_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
+                                    send_message += '\n' + guild_data[j]["normal_message"] + '\nhttps://youtu.be/' + now_data[m]['videoId']
                                     await webhook_send.webhook_send(guild_data[j]["webhook_url"], guild_data[j]["name"], guild_data[j]["picture_url"],send_message)
 
                                     # 通知を出したものはdata_jsonの「nofication」をyesに変更する
                                     now_data[o]["nofication"] = "yes"
 
-                        # 更新されたデータをdata_jsonに保存していく
-                        os.remove('./data/data_json/' + os.path.splitext(os.path.basename(files[i]))[0] + '/' + guild_data[j]["type"]  + '/' + guild_data[j]["add_id"] + ".ndjson")
-                        
-                        for n in range(0, len(now_data)):
+                    # 更新されたデータをdata_jsonに保存していく
+                    os.remove('./data/data_json/' + os.path.splitext(os.path.basename(files[i]))[0] + '/' + guild_data[j]["type"]  + '/' + guild_data[j]["add_id"] + ".ndjson")
+                    
+                    for n in range(0, len(now_data)):
 
-                            with open('./data/data_json/' + os.path.splitext(os.path.basename(files[i]))[0] + '/' + guild_data[j]["type"]  + '/' + guild_data[j]["add_id"] + ".ndjson", 'a') as f:
-                                writer = ndjson.writer(f)
-                                writer.writerow(now_data[n])
+                        with open('./data/data_json/' + os.path.splitext(os.path.basename(files[i]))[0] + '/' + guild_data[j]["type"]  + '/' + guild_data[j]["add_id"] + ".ndjson", 'a') as f:
+                            writer = ndjson.writer(f)
+                            writer.writerow(now_data[n])
+                
                 # searchの場合
                 else:
                     print('未実装領域')
@@ -284,6 +314,12 @@ class Task:
                 with open(files[i], 'a') as f:
                     writer = ndjson.writer(f)
                     writer.writerow(guild_data[k])
+            
+            # 処理が終了したprint
+            print(os.path.splitext(os.path.basename(files[i]))[0] + "の処理が終わりました。")
+
+            # エラー防止のための処理を止める時間
+            await asyncio.sleep(10)
                 
 
         #channel_sent = bot.get_channel(1090113806174273606)

@@ -31,21 +31,21 @@ class Add:
             if mode == 'video':
                 mode = 'videos'
             
-            # webhook URLが正当なものかを確認
-            try:
-                await webhook_send.webhook_send(webhook_url, "Test Webhook", "no", "Test message")
-
-            except Exception as e:
-                embed=discord.Embed(title="エラー！", description=":x:入力した内容を確認してください。:x:", color=0xff0000)
-                await interaction.followup.send(embed=embed)
-                return
-            
             # チャンネルの正当性をライブラリを用いて確認
             try:
                 streams = scrapetube.get_channel(channel_url=word, limit=2, sort_by="newest", content_type="streams")
 
                 for stream in streams:
                     print(stream['videoId'])
+            except Exception as e:
+                embed=discord.Embed(title="エラー！", description=":x:入力した内容を確認してください。:x:", color=0xff0000)
+                await interaction.followup.send(embed=embed)
+                return
+
+            # webhook URLが正当なものかを確認
+            try:
+                await webhook_send.webhook_send(webhook_url, "Test Webhook", "no", "Test message")
+
             except Exception as e:
                 embed=discord.Embed(title="エラー！", description=":x:入力した内容を確認してください。:x:", color=0xff0000)
                 await interaction.followup.send(embed=embed)
@@ -121,7 +121,7 @@ class Add:
                             "videoId" : stream['videoId'],
                             "style" : stream['thumbnailOverlays'][0]['thumbnailOverlayTimeStatusRenderer']['style'],
                             "StartTime" : StartTime,
-                            "nofication" : "no"
+                            "nofication" : "yes"
                         }
 
                         with open('./data/data_json/' + str(interaction.guild.id) + '/' + mode  + '/' + yt_channel_id + ".ndjson", 'a') as f:
@@ -138,7 +138,7 @@ class Add:
                             "videoId" : video['videoId'],
                             "style" : video['thumbnailOverlays'][0]['thumbnailOverlayTimeStatusRenderer']['style'],
                             "StartTime" : StartTime,
-                            "nofication" : "no"
+                            "nofication" : "yes"
                         }
 
                         with open('./data/data_json/' + str(interaction.guild.id) + '/' + mode  + '/' + yt_channel_id + ".ndjson", 'a') as f:

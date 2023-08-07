@@ -16,7 +16,7 @@ load_dotenv()
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-#test_guild_id = your_guild_id
+#test_guild_id = 842412412460072964
 
 @bot.event
 async def on_ready():
@@ -24,6 +24,7 @@ async def on_ready():
     # 接続時のメッセージ
     print("接続しました！")
     
+    # 「～をプレイ中」を表示させる
     await bot.change_presence(activity=discord.Game(name="/help"))
 
     # スラッシュコマンドを同期

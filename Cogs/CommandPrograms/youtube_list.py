@@ -50,7 +50,7 @@ class List:
 
             embed=discord.Embed(title="登録されている通知（" + mode + "）", color=0x00ff7f)
 
-            cut = 25
+            cut = 10
             count = 0
             for j in range(0, len(read_data)):
                 # メンションの表示を指定
@@ -62,8 +62,8 @@ class List:
 
                 if read_data[j]["type"] == mode1:
                     embed.add_field(name=str(count+1) + '. ' + read_data[j]["name"], value="チャンネルURL：" + 'https://www.youtube.com/channel/' + read_data[j]["add_id"]
-                                    +"\n投稿先チャンネル：<#" + str(read_data[j]["channel"]) + ">\nメンション：" + mention_view + "\nメッセージ："
-                                    + read_data[j]["message"], inline=False)
+                                    +"\nメンション：" + mention_view + "\n通常メッセージ：" + read_data[j]["normal_message"] + "\n 待機場所メッセージ：" 
+                                    + read_data[j]["wait_message"] + "\n プレミアム公開時メッセージ：" + read_data[j]["premium_message"], inline=False)
 
                     count += 1
                 

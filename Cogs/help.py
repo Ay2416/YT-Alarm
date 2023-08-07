@@ -6,7 +6,7 @@ from discord.ext import commands
 # My program import
 
 
-#test_guild_id = your_guild_id
+#test_guild_id = 842412412460072964
 
 class help(commands.Cog):
     def __init__(self, bot: commands.Bot):
