@@ -8,7 +8,7 @@ from Cogs.CommandPrograms.youtube_add import Add
 from Cogs.CommandPrograms.youtube_delete import Delete
 from Cogs.CommandPrograms.youtube_list import List
 
-#test_guild_id = 842412412460072964
+#test_guild_id = your_guild_id
 
 #@app_commands.guilds(test_guild_id)
 @app_commands.default_permissions(administrator=True)

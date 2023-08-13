@@ -16,7 +16,7 @@ load_dotenv()
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-#test_guild_id = 842412412460072964
+#test_guild_id = your_guild_id
 
 @bot.event
 async def on_ready():
@@ -115,7 +115,7 @@ async def on_guild_remove(guild):
         print("キックまたはBANされたため、" + str(guild.id) + "のdata_jsonを削除しました。")
 
 
-@tasks.loop(seconds=120)
+@tasks.loop(seconds=60)
 async def send_channel():
     task = Task()
     await task.send_discord(bot)

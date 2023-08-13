@@ -121,7 +121,8 @@ class Add:
                             "videoId" : stream['videoId'],
                             "style" : stream['thumbnailOverlays'][0]['thumbnailOverlayTimeStatusRenderer']['style'],
                             "StartTime" : StartTime,
-                            "nofication" : "yes"
+                            "wait_nofication" : "yes",
+                            "premium_nofication" : "yes"
                         }
 
                         with open('./data/data_json/' + str(interaction.guild.id) + '/' + mode  + '/' + yt_channel_id + ".ndjson", 'a') as f:
@@ -138,7 +139,9 @@ class Add:
                             "videoId" : video['videoId'],
                             "style" : video['thumbnailOverlays'][0]['thumbnailOverlayTimeStatusRenderer']['style'],
                             "StartTime" : StartTime,
-                            "nofication" : "yes"
+                            "normal_nofication" : "yes",
+                            "wait_nofication" : "yes",
+                            "premium_nofication" : "yes"
                         }
 
                         with open('./data/data_json/' + str(interaction.guild.id) + '/' + mode  + '/' + yt_channel_id + ".ndjson", 'a') as f:
@@ -147,7 +150,8 @@ class Add:
                 elif mode == "shorts":
                     for short in channel_content:
                         content = {
-                            "videoId" : short['videoId']
+                            "videoId" : short['videoId'],
+                            "normal_nofication" : "yes"
                         }
 
                         with open('./data/data_json/' + str(interaction.guild.id) + '/' + mode  + '/' + yt_channel_id + ".ndjson", 'a') as f:
